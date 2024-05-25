@@ -9,35 +9,37 @@ def find_coins_greedy(amount):
     for coin in coins:
         if remaining_amount <= 0:
             break
-        coin_count[coin] = remaining_amount // coin
+        count = remaining_amount // coin
+        if count > 0:
+            coin_count[coin] = count
         remaining_amount %= coin
 
     return {k: v for k, v in coin_count.items() if v > 0}
 
-
 def find_min_coins(amount):
     # Ініціалізація масиву для зберігання мінімальної кількості монет для кожної суми
     min_coins = [0] + [float('inf')] * amount
+    coin_used = [0] * (amount + 1)
 
     # Обчислення мінімальної кількості монет для кожної суми
     for coin in coins:
         for i in range(coin, amount + 1):
             if min_coins[i - coin] + 1 < min_coins[i]:
                 min_coins[i] = min_coins[i - coin] + 1
+                coin_used[i] = coin
 
     # Відновлення кількості монет кожного номіналу
     coin_count = {}
     i = amount
     while i > 0:
-        for coin in coins:
-            # if min_coins[i] == min_coins[i - coin] + 1: # by S
-            if i >= coin and min_coins[i] == min_coins[i - coin] + 1:
-                coin_count[coin] = coin_count.get(coin, 0) + 1
-                i -= coin
-                break
+        coin = coin_used[i]
+        if coin in coin_count:
+            coin_count[coin] += 1
+        else:
+            coin_count[coin] = 1
+        i -= coin
 
     return coin_count
-
 
 def compare_results():
     matches = 0
@@ -52,8 +54,8 @@ def compare_results():
         else:
             mismatches += 1
 
-    print("Кількість співпадінь результатів двох алгоритмів в діапазоні від 1коп. до 1000 коп.:", matches)
-    print("Кількість НЕспівпадінь результатів двох алгоритмів в діапазоні від 1коп. до 1000 коп.:", mismatches)
+    print("Кількість співпадінь результатів двох алгоритмів в діапазоні від 1 коп. до 1000 коп.:", matches)
+    print("Кількість НЕспівпадінь результатів двох алгоритмів в діапазоні від 1 коп. до 1000 коп.:", mismatches)
 
 compare_results()
 
@@ -82,8 +84,7 @@ def main():
 
         # 2. Динамічні результати
         result_dm = find_min_coins(amount)
-        print("Згідно Динамічного програмування - Кількість монет по номіналам:", result_dm)
-              
+        print("Згідно Динамічного програмування - Кількість монет по номіналам:", result_dm)        
         print("Чи рівні результати:", result_greedy == result_dm)
         print()  # Пустий рядок для розділення виводу між тестами
 
